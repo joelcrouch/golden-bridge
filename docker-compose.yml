@@ -28,7 +28,9 @@ services:
       - ./python-scripts:/app/python-scripts
       - ./data:/app/data
     working_dir: /app
-    command: tail -f /dev/null
+    ports:
+      - "5001:5001"
+    command: python3 /app/python-scripts/garmin_api.py
     environment:
       - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1

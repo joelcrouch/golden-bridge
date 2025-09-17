@@ -1,3 +1,4 @@
+com/goldenbridge/app/service/GarminIntegrationServiceTest.class
 com/goldenbridge/app/GoldenBridgeApplicationTests.class
 com/goldenbridge/app/repository/UserPreferencesRepositoryTest.class
 com/goldenbridge/app/config/TestJpaConfig.class

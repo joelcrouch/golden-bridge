@@ -6,3 +6,5 @@
 /home/devdell2tb/Projects/golden-bridge/src/test/java/com/goldenbridge/app/repository/UserPreferencesRepositoryTest.java
 /home/devdell2tb/Projects/golden-bridge/src/test/java/com/goldenbridge/app/repository/UserRepositoryTest.java
 /home/devdell2tb/Projects/golden-bridge/src/test/java/com/goldenbridge/app/security/JwtTokenProviderTest.java
+/home/devdell2tb/Projects/golden-bridge/src/test/java/com/goldenbridge/app/service/GarminIntegrationServiceTest.java
+/home/devdell2tb/Projects/golden-bridge/src/test/java/com/goldenbridge/app/service/PythonScriptServiceTest.java

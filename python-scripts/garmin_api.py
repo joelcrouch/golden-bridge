@@ -1,0 +1,49 @@
+from flask import Flask, request, jsonify
+from garminconnect import Garmin
+
+app = Flask(__name__)
+
+# This is a simple, in-memory way to store the API client.
+# In a production app, you might use a more robust session management solution.
+api_client = None
+
+@app.route('/garmin/login', methods=['POST'])
+def login():
+    global api_client
+    data = request.get_json()
+    if not data or 'username' not in data or 'password' not in data:
+        return jsonify({'status': 'error', 'message': 'Username and password required'}), 400
+
+    username = data['username']
+    password = data['password']
+
+    try:
+        # Initialize the Garmin client
+        api_client = Garmin(username, password)
+        # Attempt to log in
+        api_client.login()
+
+        return jsonify({'status': 'success', 'message': 'Garmin login successful'})
+
+    except Exception as e:
+        api_client = None
+        return jsonify({'status': 'error', 'message': str(e)}), 401
+
+@app.route('/garmin/status', methods=['GET'])
+def status():
+    if api_client and api_client.username:
+        return jsonify({'status': 'logged_in', 'username': api_client.username})
+    else:
+        return jsonify({'status': 'logged_out'})
+
+@app.route('/garmin/logout', methods=['POST'])
+def logout():
+    global api_client
+    if api_client:
+        api_client.logout()
+        api_client = None
+    return jsonify({'status': 'success', 'message': 'Garmin logout successful'})
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5001)

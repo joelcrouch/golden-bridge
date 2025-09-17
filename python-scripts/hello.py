@@ -1,10 +1,11 @@
-import sys
+from flask import Flask, request
 
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        name = sys.argv[1]
-        print(f"Hello, {name} from Python!")
-        sys.stdout.flush()
-    else:
-        print("Hello from Python! No name provided.")
-        sys.stdout.flush()
+app = Flask(__name__)
+
+@app.route('/hello', methods=['GET'])
+def hello():
+    name = request.args.get('name', 'World')
+    return f"Hello, {name} from Python!"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5001)
