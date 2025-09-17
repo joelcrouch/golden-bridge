@@ -1,0 +1,4 @@
+app:
+  jwt:
+    secret: dev-secret-golden-bridge-jwt-key-for-development-only
+    expiration-ms: 3600000 # 1 hour

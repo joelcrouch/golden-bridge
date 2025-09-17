@@ -1,0 +1,4 @@
+app:
+  jwt:
+    secret: prod-secret-golden-bridge-jwt-key-for-production-environment-secure-and-long-enough
+    expiration-ms: 86400000 # 24 hours

@@ -79,3 +79,27 @@ This section details the implementation of JWT authentication, including encount
 *   Manual `curl` commands confirm:
     *   `POST /api/auth/login` successfully returns a JWT token.
     *   `GET /api/auth/protected` with a valid JWT token successfully returns "You have accessed a protected resource!", confirming proper authentication and authorization.
+
+## Python Script Execution Environment Setup - 09/16/2025
+
+This section details the setup of the Python script execution environment, including encountered errors and their resolutions.
+
+### Implementation Steps:
+
+1.  **Created Python Script:** `python-scripts/hello.py` to print a greeting.
+2.  **Configured Docker Compose:** Confirmed `python-env` service in `docker-compose.yml` mounts `python-scripts` volume.
+3.  **Created Java Service:** `PythonScriptService.java` to execute Python scripts using `docker-compose exec`.
+4.  **Created Java Controller:** `PythonController.java` to expose a protected REST endpoint `/api/python/hello`.
+
+### Encountered Problems and Solutions:
+
+1.  **Problem: Python script execution failed (Empty `curl` response, `exit code 1` in Java logs)**
+    *   **Details**: Initial attempts to execute the Python script via `PythonScriptService` resulted in an empty response from the `curl` command and `Python script execution failed with exit code: 1` in the Java application logs. Direct `docker-compose exec golden-bridge-python python /app/python-scripts/hello.py Gemini` also failed with `exit code 1` and no output.
+    *   **Attempts & Debugging**: Tried `python --version`, `python3 --version`, `sh`, `bash` inside the container via `docker-compose exec`, all failing with `exit code 1` and no output. Confirmed containers were `Up` using `docker-compose ps`. Suspected PATH issues or `docker-compose exec` limitations.
+    *   **Solution 1 (Partial)**: Identified that `python` and `python3` were not in the default PATH for non-interactive shells. Modified `PythonScriptService.java` to use the full path `/usr/local/bin/python3` for the interpreter.
+    *   **Solution 2 (Partial)**: Added `sys.stdout.flush()` to `python-scripts/hello.py` to ensure immediate output flushing.
+    *   **Solution 3 (Final)**: The issue persisted. Realized `Runtime.getRuntime().exec()` has limitations with complex commands and process I/O. Refactored `PythonScriptService.java` to use `ProcessBuilder` for more robust command execution and output capture, including `processBuilder.redirectErrorStream(true)`.
+
+### Final Verification:
+
+*   Manual `curl` command to `GET /api/python/hello?name=Gemini` with a valid JWT token now successfully returns "Hello, Gemini from Python!".

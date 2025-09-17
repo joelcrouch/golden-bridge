@@ -2,6 +2,7 @@
 /home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/config/JpaConfig.java
 /home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/config/SecurityConfig.java
 /home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/controller/AuthController.java
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/controller/PythonController.java
 /home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/dto/AuthRequest.java
 /home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/dto/AuthResponse.java
 /home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/entity/Activity.java
@@ -16,4 +17,5 @@
 /home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/repository/UserRepository.java
 /home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/security/JwtAuthenticationFilter.java
 /home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/security/JwtTokenProvider.java
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/service/PythonScriptService.java
 /home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/service/UserDetailsServiceImpl.java

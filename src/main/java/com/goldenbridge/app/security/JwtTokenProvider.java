@@ -1,5 +1,6 @@
 package com.goldenbridge.app.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,9 +15,11 @@ import java.util.function.Function;
 @Component
 public class JwtTokenProvider {
 
-    // TODO: Move to application.yml
-    private final String jwtSecret = "======================GoldenBridge=Spring=Boot=======================";
-    private final long jwtExpiration = 86400000L; // 24 hours
+    @Value("${app.jwt.secret}")
+    private String jwtSecret;
+
+    @Value("${app.jwt.expiration-ms}")
+    private long jwtExpiration;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
