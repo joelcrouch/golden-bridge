@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableJpaRepositories(basePackages = "com.goldenbridge.app.repository")
-@EnableJpaAuditing
+
 @EnableTransactionManagement
 public class JpaConfig {
 }
