@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: golden-bridge
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/golden_bridge
+    username: golden_bridge_user
+    password: golden_bridge_pass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: false
+
+logging:
+  level:
+    com.goldenbridge.app: DEBUG
+    org.hibernate.SQL: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

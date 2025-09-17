@@ -1,0 +1,15 @@
+com/goldenbridge/app/entity/SyncHistory$SyncType.class
+com/goldenbridge/app/entity/Activity.class
+com/goldenbridge/app/entity/UserPreferences.class
+com/goldenbridge/app/repository/UserRepository.class
+com/goldenbridge/app/entity/GarminCredentials.class
+com/goldenbridge/app/repository/GarminCredentialsRepository.class
+com/goldenbridge/app/GoldenBridgeApplication.class
+com/goldenbridge/app/entity/SyncHistory.class
+com/goldenbridge/app/entity/Activity$SyncStatus.class
+com/goldenbridge/app/config/JpaConfig.class
+com/goldenbridge/app/entity/User.class
+com/goldenbridge/app/repository/UserPreferencesRepository.class
+com/goldenbridge/app/entity/SyncHistory$SyncStatus.class
+com/goldenbridge/app/repository/SyncHistoryRepository.class
+com/goldenbridge/app/repository/ActivityRepository.class

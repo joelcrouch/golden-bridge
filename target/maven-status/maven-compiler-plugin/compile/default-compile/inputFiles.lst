@@ -1,0 +1,12 @@
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/GoldenBridgeApplication.java
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/config/JpaConfig.java
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/entity/Activity.java
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/entity/GarminCredentials.java
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/entity/SyncHistory.java
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/entity/User.java
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/entity/UserPreferences.java
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/repository/ActivityRepository.java
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/repository/GarminCredentialsRepository.java
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/repository/SyncHistoryRepository.java
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/repository/UserPreferencesRepository.java
+/home/devdell2tb/Projects/golden-bridge/src/main/java/com/goldenbridge/app/repository/UserRepository.java
