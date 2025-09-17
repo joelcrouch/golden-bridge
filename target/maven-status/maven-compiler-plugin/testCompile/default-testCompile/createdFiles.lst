@@ -4,4 +4,5 @@ com/goldenbridge/app/config/TestJpaConfig.class
 com/goldenbridge/app/repository/ActivityRepositoryTest.class
 com/goldenbridge/app/repository/GarminCredentialsRepositoryTest.class
 com/goldenbridge/app/repository/SyncHistoryRepositoryTest.class
+com/goldenbridge/app/security/JwtTokenProviderTest.class
 com/goldenbridge/app/repository/UserRepositoryTest.class

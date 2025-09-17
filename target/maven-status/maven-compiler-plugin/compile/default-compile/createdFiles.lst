@@ -2,6 +2,7 @@ com/goldenbridge/app/security/JwtAuthenticationFilter.class
 com/goldenbridge/app/entity/SyncHistory$SyncType.class
 com/goldenbridge/app/entity/Activity.class
 com/goldenbridge/app/dto/AuthResponse.class
+com/goldenbridge/app/controller/PythonController.class
 com/goldenbridge/app/entity/UserPreferences.class
 com/goldenbridge/app/entity/GarminCredentials.class
 com/goldenbridge/app/GoldenBridgeApplication.class
@@ -20,3 +21,4 @@ com/goldenbridge/app/config/JpaConfig.class
 com/goldenbridge/app/entity/User.class
 com/goldenbridge/app/repository/SyncHistoryRepository.class
 com/goldenbridge/app/repository/ActivityRepository.class
+com/goldenbridge/app/service/PythonScriptService.class
