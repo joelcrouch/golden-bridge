@@ -1,0 +1,83 @@
+# Java
+*.class
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.next
+pom.xml.bak
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.stacktrace
+release.properties
+rebel.xml
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS-specific
+.DS_Store
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+
+# Compiled class files
+*.class
+
+# Package Files
+*.jar
+*.war
+*.ear
+
+# IDE-specific files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS generated files
+.DS_Store
+.localized
+Thumbs.db
+
+# Maven generated files
+/target/
+
+# Spring Boot
+/src/main/resources/static/
+/src/main/resources/public/
+
+# Flyway
+/src/main/resources/db/migration/*.sql
+
+# Docker
+*.log
+*.tmp
+
+# Sensitive files
+*.key
+*.pem
+*.p12
+*.jks
+
+# Python
+*.pyc
+__pycache__/
+.Python
+venv/
+
+# Other
+*.swp
+*~
