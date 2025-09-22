@@ -19,7 +19,7 @@ def login():
 
     try:
         # Initialize the Garmin client
-        api_client = Garmin(username, password)
+        api_client = Garmin(username, password, user_agent="com.garmin.android.apps.connectmobile")
         # Attempt to log in
         api_client.login()
 
@@ -50,6 +50,24 @@ def logout():
 def hello():
     name = request.args.get('name', 'World')
     return f"Hello, {name} from Python!"
+
+
+
+@app.route('/garmin/activities', methods=['GET'])
+def get_activities():
+    if not api_client or not api_client.username:
+        return jsonify({'status': 'error', 'message': 'Not logged in'}), 401
+
+    try:
+        start = request.args.get('start', 0, type=int)
+        limit = request.args.get('limit', 10, type=int)
+
+        activities = api_client.get_activities(start, limit)
+
+        return jsonify(activities)
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
 if __name__ == '__main__':

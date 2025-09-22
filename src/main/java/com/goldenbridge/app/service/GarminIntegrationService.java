@@ -59,4 +59,14 @@ public class GarminIntegrationService {
 
         return restTemplate.postForObject(url, null, GarminLogoutResponse.class);
     }
+
+    public String getGarminActivities(int start, int limit) {
+        String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
+                .path("/garmin/activities")
+                .queryParam("start", start)
+                .queryParam("limit", limit)
+                .toUriString();
+
+        return restTemplate.getForObject(url, String.class);
+    }
 }

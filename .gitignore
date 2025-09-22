@@ -82,3 +82,6 @@ venv/
 *.swp
 *~
 *.png
+
+
+test_garmin.sh
