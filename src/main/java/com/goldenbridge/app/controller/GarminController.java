@@ -23,4 +23,10 @@ public class GarminController {
         String activities = garminIntegrationService.getGarminActivities(start, limit);
         return ResponseEntity.ok(activities);
     }
+
+    @GetMapping("/activity_detail/{activityId}")
+    public ResponseEntity<String> getGarminActivityDetails(@PathVariable long activityId) {
+        String activityDetails = garminIntegrationService.getGarminActivityDetails(activityId);
+        return ResponseEntity.ok(activityDetails);
+    }
 }

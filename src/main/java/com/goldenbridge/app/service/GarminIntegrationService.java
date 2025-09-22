@@ -69,4 +69,12 @@ public class GarminIntegrationService {
 
         return restTemplate.getForObject(url, String.class);
     }
+
+    public String getGarminActivityDetails(long activityId) {
+        String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
+                .path("/garmin/activity_detail/" + activityId)
+                .toUriString();
+
+        return restTemplate.getForObject(url, String.class);
+    }
 }

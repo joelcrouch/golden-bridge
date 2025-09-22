@@ -69,6 +69,19 @@ def get_activities():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+@app.route('/garmin/activity_detail/<int:activity_id>', methods=['GET'])
+def get_activity_detail(activity_id):
+    if not api_client or not api_client.username:
+        return jsonify({'status': 'error', 'message': 'Not logged in'}), 401
+
+    try:
+        activity_details = api_client.get_activity_details(activity_id)
+        return jsonify(activity_details)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
