@@ -103,3 +103,31 @@ This section details the setup of the Python script execution environment, inclu
 ### Final Verification:
 
 *   Manual `curl` command to `GET /api/python/hello?name=Gemini` with a valid JWT token now successfully returns "Hello, Gemini from Python!".
+
+## Test Coverage Improvement - 09/16/2025
+
+This section details efforts to improve test coverage, specifically for the `JwtTokenProvider` class.
+
+### Implementation Steps:
+
+1.  **Created Unit Test Class:** `src/test/java/com/goldenbridge/app/security/JwtTokenProviderTest.java`.
+2.  **Added Tests for `JwtTokenProvider`:** Included tests for `generateToken`, `getUsernameFromToken`, and `validateToken` methods.
+
+### Encountered Problems and Solutions:
+
+1.  **Problem: `WeakKeyException` in `JwtTokenProviderTest`**
+    *   **Details**: Tests in `JwtTokenProviderTest` failed with `io.jsonwebtoken.security.WeakKeyException: The signing key's size is 400 bits which is not secure enough for the HS512 algorithm.` This occurred because the `testSecret` defined in the test class was too short (50 characters) for the HS512 algorithm, which requires a key of at least 512 bits (64 bytes).
+    *   **Solution**: Modified `JwtTokenProviderTest.java` to use a longer `testSecret` string (at least 64 characters).
+
+2.  **Problem: `ExpiredJwtException` in `JwtTokenProviderTest`**
+    *   **Details**: After fixing the `WeakKeyException`, the `validateToken_shouldReturnFalseForExpiredToken` test failed with `io.jsonwebtoken.ExpiredJwtException`. This happened because the `Jwts.parserBuilder()` was throwing an exception when encountering an expired token, rather than `validateToken` returning `false` gracefully.
+    *   **Solution**: Modified `JwtTokenProvider.java` to wrap the token parsing/validation logic in `validateToken` (and `getUsernameFromToken`) with `try-catch` blocks to handle `ExpiredJwtException`, `SignatureException`, `MalformedJwtException`, `UnsupportedJwtException`, and `IllegalArgumentException` gracefully. This ensures `validateToken` returns `false` for invalid/expired tokens without throwing exceptions.
+
+3.  **Problem: `cannot find symbol` errors in `JwtTokenProvider.java` (Compilation Error)**
+    *   **Details**: After adding `try-catch` blocks and logger, the compiler reported numerous `cannot find symbol` errors for classes like `Component`, `Key`, `UserDetails`, `Value`, `Jwts`, `Claims`, `Date`, `SignatureAlgorithm`, `Keys`, `Function`, `Logger`, `LoggerFactory`, and various JWT exception types. This was due to missing import statements.
+    *   **Solution**: Added all necessary import statements to the top of `JwtTokenProvider.java`.
+
+### Final Verification:
+
+*   All Maven `clean install` operations now complete successfully, with all tests passing.
+*   Overall test coverage increased to 46%.
