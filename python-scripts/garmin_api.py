@@ -1,5 +1,12 @@
-from flask import Flask, request, jsonify
-from garminconnect import Garmin
+from flask import Flask, request, jsonify, send_file
+from garminconnect import (
+    Garmin,
+    GarminConnectAuthenticationError,
+    GarminConnectConnectionError,
+    GarminConnectTooManyRequestsError
+)
+
+import io
 
 app = Flask(__name__)
 
@@ -78,6 +85,23 @@ def get_activity_detail(activity_id):
         activity_details = api_client.get_activity_details(activity_id)
         return jsonify(activity_details)
     except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/garmin/activity_download/<int:activity_id>', methods=['GET'])
+def download_activity(activity_id):
+    if not api_client or not api_client.username:
+        return jsonify({'status': 'error', 'message': 'Not logged in'}), 401
+
+    try:
+        fit_data = api_client.download_activity(activity_id, dl_fmt=api_client.ActivityDownloadFormat.FIT)
+        return send_file(
+            io.BytesIO(fit_data),
+            mimetype='application/octet-stream',
+            as_attachment=True,
+            download_name=f'activity_{activity_id}.fit'
+        )
+    except Exception as e:
+        print(f"Error in download_activity: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
