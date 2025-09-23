@@ -60,67 +60,46 @@ def hello():
 
 
 
+from garmin_utils import garmin_api_wrapper
+
 @app.route('/garmin/activities', methods=['GET'])
+@garmin_api_wrapper
 def get_activities():
-    if not api_client or not api_client.username:
-        return jsonify({'status': 'error', 'message': 'Not logged in'}), 401
+    start = request.args.get('start', 0, type=int)
+    limit = request.args.get('limit', 10, type=int)
 
-    try:
-        start = request.args.get('start', 0, type=int)
-        limit = request.args.get('limit', 10, type=int)
+    activities = api_client.get_activities(start, limit)
 
-        activities = api_client.get_activities(start, limit)
-
-        return jsonify(activities)
-
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+    return jsonify(activities)
 
 @app.route('/garmin/activity_detail/<int:activity_id>', methods=['GET'])
+@garmin_api_wrapper
 def get_activity_detail(activity_id):
-    if not api_client or not api_client.username:
-        return jsonify({'status': 'error', 'message': 'Not logged in'}), 401
-
-    try:
-        activity_details = api_client.get_activity_details(activity_id)
-        return jsonify(activity_details)
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+    activity_details = api_client.get_activity_details(activity_id)
+    return jsonify(activity_details)
 
 @app.route('/garmin/activity_download/<int:activity_id>', methods=['GET'])
+@garmin_api_wrapper
 def download_activity(activity_id):
-    if not api_client or not api_client.username:
-        return jsonify({'status': 'error', 'message': 'Not logged in'}), 401
-
-    try:
-        fit_data = api_client.download_activity(activity_id, dl_fmt=api_client.ActivityDownloadFormat.FIT)
-        return send_file(
-            io.BytesIO(fit_data),
-            mimetype='application/octet-stream',
-            as_attachment=True,
-            download_name=f'activity_{activity_id}.fit'
-        )
-    except Exception as e:
-        print(f"Error in download_activity: {e}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+    fit_data = api_client.download_activity(activity_id, dl_fmt=api_client.ActivityDownloadFormat.FIT)
+    return send_file(
+        io.BytesIO(fit_data),
+        mimetype='application/octet-stream',
+        as_attachment=True,
+        download_name=f'activity_{activity_id}.fit'
+    )
 
 @app.route('/garmin/health', methods=['GET'])
+@garmin_api_wrapper
 def get_health_summary():
-    if not api_client or not api_client.username:
-        return jsonify({'status': 'error', 'message': 'Not logged in'}), 401
+    cdate = request.args.get('cdate') # YYYY-MM-DD format
+    if not cdate:
+        # Default to today's date if not provided
+        from datetime import date
+        cdate = date.today().strftime('%Y-%m-%d')
 
-    try:
-        cdate = request.args.get('cdate') # YYYY-MM-DD format
-        if not cdate:
-            # Default to today's date if not provided
-            from datetime import date
-            cdate = date.today().strftime('%Y-%m-%d')
-
-        health_summary = api_client.get_user_summary(cdate)
-        return jsonify(health_summary)
-    except Exception as e:
-        print(f"Error in get_health_summary: {e}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+    health_summary = api_client.get_user_summary(cdate)
+    return jsonify(health_summary)
 
 
 
