@@ -36,6 +36,9 @@ class MockGarmin:
     def logout(self):
         pass
 
+    def get_user_summary(self, cdate):
+        return {"cdate": cdate, "summary": "Mock health summary for " + cdate}
+
     class ActivityDownloadFormat:
         FIT = "fit" # Or whatever value is expected by the download_activity mock
 
@@ -105,72 +108,7 @@ class GarminApiTest(unittest.TestCase):
         response = self.app.get('/garmin/activities')
         self.assertEqual(response.status_code, 401)
         self.assertEqual(json.loads(response.data)['status'], 'error')
-docker logs golden-bridge-python
- * Serving Flask app 'garmin_api'
- * Debug mode: off
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on all addresses (0.0.0.0)
- * Running on http://127.0.0.1:5001
- * Running on http://172.18.0.2:5001
-Press CTRL+C to quit
-devdell2tb@devdell2tb-Precision-3591:~/Projects/golden-bridge$ ./rebuild_docker.sh 
----Bringing down docker containers---
-WARN[0000] /home/devdell2tb/Projects/golden-bridge/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
-[+] Running 3/3
- ✔ Container golden-bridge-postgres  Removed                                                                                            0.3s 
- ✔ Container golden-bridge-python    Removed                                                                                           10.2s 
- ✔ Network golden-bridge_default     Removed                                                                                            0.3s 
----Building and starting containers--
-WARN[0000] /home/devdell2tb/Projects/golden-bridge/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
-WARN[0000] Docker Compose is configured to build using Bake, but buildx isn't installed 
-[+] Building 0.3s (13/13) FINISHED                                                                                            docker:default
- => [python-env internal] load build definition from Dockerfile                                                                         0.0s
- => => transferring dockerfile: 382B                                                                                                    0.0s
- => [python-env internal] load metadata for docker.io/library/python:3.11-slim                                                          0.0s
- => [python-env internal] load .dockerignore                                                                                            0.0s
- => => transferring context: 2B                                                                                                         0.0s
- => [python-env 1/7] FROM docker.io/library/python:3.11-slim                                                                            0.0s
- => [python-env internal] load build context                                                                                            0.0s
- => => transferring context: 17.20kB                                                                                                    0.0s
- => CACHED [python-env 2/7] WORKDIR /app                                                                                                0.0s
- => CACHED [python-env 3/7] RUN apt-get update && apt-get install -y     gcc     g++     && rm -rf /var/lib/apt/lists/*                 0.0s
- => CACHED [python-env 4/7] COPY docker/python/requirements.txt .                                                                       0.0s
- => CACHED [python-env 5/7] RUN pip install --no-cache-dir -r requirements.txt                                                          0.0s
- => CACHED [python-env 6/7] RUN mkdir -p /app/python-scripts /app/data                                                                  0.0s
- => [python-env 7/7] COPY python-scripts/ /app/python-scripts/                                                                          0.1s
- => [python-env] exporting to image                                                                                                     0.1s
- => => exporting layers                                                                                                                 0.0s
- => => writing image sha256:fee9665595865d2d81d04cddb111d2814cfd95238652069c15d45a4ea0f1c175                                            0.0s
- => => naming to docker.io/library/golden-bridge-python-env                                                                             0.0s
- => [python-env] resolving provenance for metadata file                                                                                 0.0s
-[+] Running 4/4
- ✔ python-env                        Built                                                                                              0.0s 
- ✔ Network golden-bridge_default     Created                                                                                            0.1s 
- ✔ Container golden-bridge-python    Started                                                                                            0.4s 
- ✔ Container golden-bridge-postgres  Started                                                                                            0.4s 
----Docker Operations complete---
-devdell2tb@devdell2tb-Precision-3591:~/Projects/golden-bridge$ docker ps 
-CONTAINER ID   IMAGE                      COMMAND                  CREATED         STATUS                            PORTS                                       NAMES
-3beb916d359e   postgres:14                "docker-entrypoint.s…"   4 seconds ago   Up 4 seconds (health: starting)   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp   golden-bridge-postgres
-dd2497c1ec49   golden-bridge-python-env   "python3 /app/python…"   4 seconds ago   Up 4 seconds                      0.0.0.0:5001->5001/tcp, :::5001->5001/tcp   golden-bridge-python
-devdell2tb@devdell2tb-Precision-3591:~/Projects/golden-bridge$ docker exec golden-bridge-python pytest /app/python-scripts/test_garmin_api.py
-============================= test session starts ==============================
-platform linux -- Python 3.11.13, pytest-8.4.2, pluggy-1.6.0
-rootdir: /app
-collected 11 items
 
-python-scripts/test_garmin_api.py ...........                            [100%]
-
-============================== 11 passed in 0.37s ==============================
-devdell2tb@devdell2tb-Precision-3591:~/Projects/golden-bridge$ docker logs golden-bridge-python
- * Serving Flask app 'garmin_api'
- * Debug mode: off
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on all addresses (0.0.0.0)
- * Running on http://127.0.0.1:5001
- * Running on http://172.18.0.2:5001
-Press CTRL+C to quit
-devdell2tb@devdell2tb-Precision-3591:~/Projects/golden-bridge$ 
 
 
     def test_garmin_activity_detail_success(self):
@@ -196,6 +134,19 @@ devdell2tb@devdell2tb-Precision-3591:~/Projects/golden-bridge$
     def test_garmin_activity_download_not_logged_in(self):
         garmin_api.api_client = None # Ensure logged out state
         response = self.app.get('/garmin/activity_download/456')
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(json.loads(response.data)['status'], 'error')
+
+    def test_garmin_health_summary_success(self):
+        response = self.app.get('/garmin/health?cdate=2025-09-22')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(data['cdate'], '2025-09-22')
+        self.assertIn('Mock health summary', data['summary'])
+
+    def test_garmin_health_summary_not_logged_in(self):
+        garmin_api.api_client = None # Ensure logged out state
+        response = self.app.get('/garmin/health')
         self.assertEqual(response.status_code, 401)
         self.assertEqual(json.loads(response.data)['status'], 'error')
 

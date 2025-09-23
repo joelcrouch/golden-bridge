@@ -104,6 +104,24 @@ def download_activity(activity_id):
         print(f"Error in download_activity: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+@app.route('/garmin/health', methods=['GET'])
+def get_health_summary():
+    if not api_client or not api_client.username:
+        return jsonify({'status': 'error', 'message': 'Not logged in'}), 401
+
+    try:
+        cdate = request.args.get('cdate') # YYYY-MM-DD format
+        if not cdate:
+            # Default to today's date if not provided
+            from datetime import date
+            cdate = date.today().strftime('%Y-%m-%d')
+
+        health_summary = api_client.get_user_summary(cdate)
+        return jsonify(health_summary)
+    except Exception as e:
+        print(f"Error in get_health_summary: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 
 
 
