@@ -80,6 +80,7 @@ public class JwtTokenProvider {
     private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
+                .setAllowedClockSkewSeconds(5) // Allow 5 seconds clock skew
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

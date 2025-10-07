@@ -1,5 +1,6 @@
 package com.goldenbridge.app.service;
 
+import com.goldenbridge.app.exception.ActivityDownloadException;
 import com.goldenbridge.app.dto.GarminLoginRequest;
 import com.goldenbridge.app.dto.GarminLoginResponse;
 import com.goldenbridge.app.dto.GarminLogoutResponse;
@@ -16,21 +17,30 @@ public class GarminIntegrationService {
     private final RestTemplate restTemplate;
     private final String pythonServiceBaseUrl;
 
-    public GarminIntegrationService(RestTemplate restTemplate, @Value("${python.service.base-url}") String pythonServiceBaseUrl) {
+    // Default URL ensures tests won’t fail if property is missing
+    public GarminIntegrationService(RestTemplate restTemplate,
+                                    @Value("${python.service.base-url:http://localhost:5001}") String pythonServiceBaseUrl) {
         this.restTemplate = restTemplate;
         this.pythonServiceBaseUrl = pythonServiceBaseUrl;
     }
 
+    private void validateBaseUrl() {
+        if (pythonServiceBaseUrl == null || pythonServiceBaseUrl.isBlank()) {
+            throw new IllegalStateException("Python service base URL is not configured!");
+        }
+    }
+
     public String callHello(String name) {
+        validateBaseUrl();
         String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
                 .path("/hello")
                 .queryParam("name", name)
                 .toUriString();
-
         return restTemplate.getForObject(url, String.class);
     }
 
     public GarminLoginResponse loginToGarmin(GarminLoginRequest loginRequest) {
+        validateBaseUrl();
         String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
                 .path("/garmin/login")
                 .toUriString();
@@ -38,13 +48,12 @@ public class GarminIntegrationService {
         try {
             return restTemplate.postForObject(url, loginRequest, GarminLoginResponse.class);
         } catch (HttpClientErrorException e) {
-            // The Python service returns a 401 on login failure, which throws this exception.
-            // We can return a custom response or re-throw a custom exception.
             return new GarminLoginResponse("error", "Failed to login to Garmin: " + e.getResponseBodyAsString());
         }
     }
 
     public GarminStatusResponse getGarminStatus() {
+        validateBaseUrl();
         String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
                 .path("/garmin/status")
                 .toUriString();
@@ -53,6 +62,7 @@ public class GarminIntegrationService {
     }
 
     public GarminLogoutResponse logoutFromGarmin() {
+        validateBaseUrl();
         String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
                 .path("/garmin/logout")
                 .toUriString();
@@ -61,6 +71,7 @@ public class GarminIntegrationService {
     }
 
     public String getGarminActivities(int start, int limit) {
+        validateBaseUrl();
         String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
                 .path("/garmin/activities")
                 .queryParam("start", start)
@@ -69,4 +80,152 @@ public class GarminIntegrationService {
 
         return restTemplate.getForObject(url, String.class);
     }
+
+    public byte[] downloadActivityFitFile(String activityId) {
+        validateBaseUrl();
+        String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
+                .path("/garmin/activity/{activityId}/download")
+                .buildAndExpand(activityId)
+                .toUriString();
+
+        try {
+            return restTemplate.getForObject(url, byte[].class);
+        } catch (HttpClientErrorException e) {
+            String errorMsg = String.format(
+                    "Failed to download FIT file for activity %s: %s %s",
+                    activityId, e.getStatusCode(), e.getResponseBodyAsString()
+            );
+            throw new ActivityDownloadException(errorMsg, e);
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "Unexpected error downloading FIT file for activity %s: %s",
+                    activityId, e.getMessage()
+            );
+            throw new ActivityDownloadException(errorMsg, e);
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// package com.goldenbridge.app.service;
+
+// import com.goldenbridge.app.exception.ActivityDownloadException;
+// import com.goldenbridge.app.dto.GarminLoginRequest;
+// import com.goldenbridge.app.dto.GarminLoginResponse;
+// import com.goldenbridge.app.dto.GarminLogoutResponse;
+// import com.goldenbridge.app.dto.GarminStatusResponse;
+// import org.springframework.beans.factory.annotation.Value;
+// import org.springframework.stereotype.Service;
+// import org.springframework.web.client.HttpClientErrorException;
+// import org.springframework.web.client.RestTemplate;
+// import org.springframework.web.util.UriComponentsBuilder;
+
+// @Service
+// public class GarminIntegrationService {
+
+//     private final RestTemplate restTemplate;
+//     private final String pythonServiceBaseUrl;
+
+//     public GarminIntegrationService(RestTemplate restTemplate, @Value("${python.service.base-url}") String pythonServiceBaseUrl) {
+//         this.restTemplate = restTemplate;
+//         this.pythonServiceBaseUrl = pythonServiceBaseUrl;
+//     }
+
+//     public String callHello(String name) {
+//         String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
+//                 .path("/hello")
+//                 .queryParam("name", name)
+//                 .toUriString();
+
+//         return restTemplate.getForObject(url, String.class);
+//     }
+
+//     public GarminLoginResponse loginToGarmin(GarminLoginRequest loginRequest) {
+//         String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
+//                 .path("/garmin/login")
+//                 .toUriString();
+
+//         try {
+//             return restTemplate.postForObject(url, loginRequest, GarminLoginResponse.class);
+//         } catch (HttpClientErrorException e) {
+//             // The Python service returns a 401 on login failure, which throws this exception.
+//             // We can return a custom response or re-throw a custom exception.
+//             return new GarminLoginResponse("error", "Failed to login to Garmin: " + e.getResponseBodyAsString());
+//         }
+//     }
+
+//     public GarminStatusResponse getGarminStatus() {
+//         String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
+//                 .path("/garmin/status")
+//                 .toUriString();
+
+//         return restTemplate.getForObject(url, GarminStatusResponse.class);
+//     }
+
+//     public GarminLogoutResponse logoutFromGarmin() {
+//         String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
+//                 .path("/garmin/logout")
+//                 .toUriString();
+
+//         return restTemplate.postForObject(url, null, GarminLogoutResponse.class);
+//     }
+
+//     public String getGarminActivities(int start, int limit) {
+//         String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
+//                 .path("/garmin/activities")
+//                 .queryParam("start", start)
+//                 .queryParam("limit", limit)
+//                 .toUriString();
+
+//         return restTemplate.getForObject(url, String.class);
+//     }
+
+//     public byte[] downloadActivityFitFile(String activityId) {
+//         String url = UriComponentsBuilder.fromHttpUrl(pythonServiceBaseUrl)
+//                 .path("/garmin/activity/{activityId}/download")
+//                 .buildAndExpand(activityId)
+//                 .toUriString();
+
+//         try {
+//             return restTemplate.getForObject(url, byte[].class);
+//         } catch (HttpClientErrorException e) {
+//             String errorMsg = String.format(
+//                     "Failed to download FIT file for activity %s: %s %s",
+//                     activityId, e.getStatusCode(), e.getResponseBodyAsString()
+//             );
+//             System.err.println(errorMsg); // optional: replace with a logger
+//             throw new ActivityDownloadException(errorMsg, e);
+//         } catch (Exception e) {
+//             // Catch any other unexpected errors (timeouts, etc.)
+//             String errorMsg = String.format(
+//                     "Unexpected error downloading FIT file for activity %s: %s",
+//                     activityId, e.getMessage()
+//             );
+//             System.err.println(errorMsg);
+//             throw new ActivityDownloadException(errorMsg, e);
+//         }
+//     }
+// }
