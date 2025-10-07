@@ -1,0 +1,138 @@
+## High-Level API Endpoint List
+
+This document provides a high-level overview of the Golden Bridge application's API endpoints and database schema.
+
+### Application Authentication & Management
+
+| Method | Endpoint                  | Description                                                                 |
+| ------ | ------------------------- | --------------------------------------------------------------------------- |
+| `POST` | `/api/auth/register`      | Creates a new user account for the Golden Bridge application.               |
+| `POST` | `/api/auth/login`         | Authenticates a user and returns a JWT token for accessing protected endpoints. |
+| `GET`  | `/api/auth/protected`     | An example of a protected endpoint that requires a valid JWT token.         |
+
+### Garmin Integration
+
+| Method | Endpoint                                   | Description                                                  |
+| ------ | ------------------------------------------ | ------------------------------------------------------------ |
+| `POST` | `/api/auth/garmin/login`                   | Logs into Garmin Connect using the provided credentials.     |
+| `GET`  | `/api/auth/garmin/status`                  | Checks the current login status with Garmin Connect.         |
+| `POST` | `/api/auth/garmin/logout`                  | Logs out from Garmin Connect.                                |
+| `GET`  | `/api/garmin/activities`                   | Fetches a list of recent activities from Garmin Connect.     |
+| `GET`  | `/api/garmin/activities/{activityId}/download` | Downloads the FIT file for a specific activity.              |
+
+### Test Endpoint
+
+| Method | Endpoint            | Description                                                                  |
+| ------ | ------------------- | ---------------------------------------------------------------------------- |
+| `GET`  | `/api/python/hello` | A simple test endpoint that calls the Python service and returns a "Hello" message. |
+
+---
+
+## Database Schema Description
+
+The database schema is designed to store user information, Garmin credentials, activities, sync history, and user preferences.
+
+### `users` table
+
+Stores information about the users of the Golden Bridge application.
+
+| Column      | Type          | Description                                      |
+| ----------- | ------------- | ------------------------------------------------ |
+| `id`        | `BIGINT`      | Primary key.                                     |
+| `username`  | `VARCHAR(50)` | Unique username for the user.                    |
+| `email`     | `VARCHAR(255)`| Unique email for the user.                       |
+| `password`  | `VARCHAR(255)`| Hashed password for the user.                    |
+| `first_name`| `VARCHAR(50)` | User's first name.                               |
+| `last_name` | `VARCHAR(50)` | User's last name.                                |
+| `is_active` | `BOOLEAN`     | Whether the user's account is active.            |
+| `sync_enabled`| `BOOLEAN`     | Whether sync is enabled for the user.            |
+| `created_at`| `TIMESTAMP`   | Timestamp of when the user was created.          |
+| `updated_at`| `TIMESTAMP`   | Timestamp of when the user was last updated.     |
+
+### `garmin_credentials` table
+
+Stores the encrypted Garmin Connect credentials for each user.
+
+| Column               | Type          | Description                                                |
+| -------------------- | ------------- | ---------------------------------------------------------- |
+| `id`                 | `BIGINT`      | Primary key.                                               |
+| `garmin_username`    | `VARCHAR(255)`| User's Garmin Connect username.                            |
+| `encrypted_password` | `TEXT`        | Encrypted Garmin Connect password.                         |
+| `is_valid`           | `BOOLEAN`     | Whether the credentials are valid.                         |
+| `last_validated_at`  | `TIMESTAMP`   | Timestamp of when the credentials were last validated.     |
+| `validation_error`   | `VARCHAR(255)`| Last validation error message.                             |
+| `created_at`         | `TIMESTAMP`   | Timestamp of when the credentials were created.            |
+| `updated_at`         | `TIMESTAMP`   | Timestamp of when the credentials were last updated.       |
+| `user_id`            | `BIGINT`      | Foreign key to the `users` table (one-to-one relationship).|
+
+### `activities` table
+
+Stores information about the activities synced from Garmin Connect.
+
+| Column                | Type             | Description                                      |
+| --------------------- | ---------------- | ------------------------------------------------ |
+| `id`                  | `BIGINT`         | Primary key.                                     |
+| `garmin_activity_id`  | `VARCHAR(255)`   | Unique ID of the activity from Garmin Connect.   |
+| `activity_name`       | `VARCHAR(255)`   | Name of the activity.                            |
+| `activity_type`       | `VARCHAR(50)`    | Type of the activity (e.g., `cycling`, `running`).|
+| `activity_date`       | `TIMESTAMP`      | Date and time of the activity.                   |
+| `duration_seconds`    | `INTEGER`        | Duration of the activity in seconds.             |
+| `distance_meters`     | `DECIMAL(10, 2)` | Distance of the activity in meters.              |
+| `calories`            | `INTEGER`        | Calories burned during the activity.             |
+| `average_heart_rate`  | `INTEGER`        | Average heart rate during the activity.          |
+| `max_heart_rate`      | `INTEGER`        | Maximum heart rate during the activity.          |
+| `average_power`       | `INTEGER`        | Average power during the activity.               |
+| `max_power`           | `INTEGER`        | Maximum power during the activity.               |
+| `elevation_gain_meters`| `DECIMAL(8, 2)`  | Total elevation gain in meters.                  |
+| `average_speed_kmh`   | `DECIMAL(6, 2)`  | Average speed in km/h.                           |
+| `max_speed_kmh`       | `DECIMAL(6, 2)`  | Maximum speed in km/h.                           |
+| `raw_data`            | `TEXT`           | Raw JSON data of the activity from Garmin.       |
+| `fit_file_path`       | `VARCHAR(255)`   | Path to the downloaded FIT file.                 |
+| `gpx_file_path`       | `VARCHAR(255)`   | Path to the downloaded GPX file.                 |
+| `data_hash`           | `VARCHAR(64)`    | Hash of the activity data for deduplication.     |
+| `sync_status`         | `VARCHAR(255)`   | Sync status of the activity (e.g., `PENDING`).   |
+| `sync_error`          | `TEXT`           | Error message if the sync failed.                |
+| `last_sync_attempt`   | `TIMESTAMP`      | Timestamp of the last sync attempt.              |
+| `golden_cheetah_path` | `VARCHAR(255)`   | Path to the activity in Golden Cheetah.          |
+| `created_at`          | `TIMESTAMP`      | Timestamp of when the activity was created.      |
+| `updated_at`          | `TIMESTAMP`      | Timestamp of when the activity was last updated. |
+| `user_id`             | `BIGINT`         | Foreign key to the `users` table.                |
+
+### `sync_history` table
+
+Stores a log of all sync operations.
+
+| Column               | Type           | Description                                      |
+| -------------------- | -------------- | ------------------------------------------------ |
+| `id`                 | `BIGINT`       | Primary key.                                     |
+| `sync_type`          | `VARCHAR(255)` | Type of sync (e.g., `MANUAL`, `SCHEDULED`).      |
+| `sync_status`        | `VARCHAR(255)` | Status of the sync (e.g., `STARTED`, `COMPLETED`).|
+| `sync_started_at`    | `TIMESTAMP`    | Timestamp of when the sync started.              |
+| `sync_completed_at`  | `TIMESTAMP`    | Timestamp of when the sync completed.            |
+| `activities_processed`| `INTEGER`      | Number of activities processed during the sync.  |
+| `activities_synced`  | `INTEGER`      | Number of activities successfully synced.        |
+| `activities_skipped` | `INTEGER`      | Number of activities skipped (e.g., duplicates). |
+| `activities_failed`  | `INTEGER`      | Number of activities that failed to sync.        |
+| `error_message`      | `TEXT`         | Error message if the sync failed.                |
+| `sync_details`       | `TEXT`         | Detailed log of the sync operation.              |
+| `created_at`         | `TIMESTAMP`    | Timestamp of when the sync history was created.  |
+| `user_id`            | `BIGINT`       | Foreign key to the `users` table.                |
+
+### `user_preferences` table
+
+Stores user-specific settings for the application.
+
+| Column                 | Type           | Description                                                |
+| ---------------------- | -------------- | ---------------------------------------------------------- |
+| `id`                   | `BIGINT`       | Primary key.                                               |
+| `auto_sync_enabled`    | `BOOLEAN`      | Whether auto-sync is enabled for the user.                 |
+| `sync_frequency_hours` | `INTEGER`      | Frequency of auto-sync in hours.                           |
+| `sync_activity_types`  | `VARCHAR(255)` | Comma-separated list of activity types to sync.            |
+| `golden_cheetah_path`  | `VARCHAR(255)` | Path to the user's Golden Cheetah data directory.          |
+| `notifications_enabled`| `BOOLEAN`      | Whether notifications are enabled for the user.            |
+| `email_notifications`  | `BOOLEAN`      | Whether email notifications are enabled for the user.      |
+| `max_sync_days`        | `INTEGER`      | Maximum number of days to sync activities from.            |
+| `timezone`             | `VARCHAR(50)`  | User's timezone.                                           |
+| `created_at`           | `TIMESTAMP`    | Timestamp of when the preferences were created.            |
+| `updated_at`           | `TIMESTAMP`    | Timestamp of when the preferences were last updated.       |
+| `user_id`              | `BIGINT`       | Foreign key to the `users` table (one-to-one relationship).|

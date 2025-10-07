@@ -1,4 +1,4 @@
-garminconnect==0.1.10
+garminconnect==0.2.8
 Flask
 requests==2.31.0
 python-dateutil==2.8.2

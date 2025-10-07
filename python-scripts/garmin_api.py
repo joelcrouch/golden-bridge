@@ -1,4 +1,5 @@
 import io
+import traceback
 from flask import Flask, jsonify, request, send_file
 from garminconnect import Garmin
 from garmin_activity_detail import download_fit_file
@@ -23,13 +24,14 @@ def login():
 
     try:
         # Initialize the Garmin client
-        api_client = Garmin(username, password, user_agent="com.garmin.android.apps.connectmobile")
+        api_client = Garmin(username, password)
         # Attempt to log in
         api_client.login()
 
         return jsonify({'status': 'success', 'message': 'Garmin login successful'})
 
     except Exception as e:
+        traceback.print_exc()
         api_client = None
         return jsonify({'status': 'error', 'message': str(e)}), 401
 
