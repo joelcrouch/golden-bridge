@@ -85,3 +85,7 @@ venv/
 
 
 test_garmin.sh
+query.txt
+query2.txt
+query3.txt
+test_log.txt
