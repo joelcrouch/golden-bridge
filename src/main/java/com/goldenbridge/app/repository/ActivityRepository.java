@@ -39,6 +39,8 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     List<Object[]> getActivityTypeStatsByUser(@Param("user") User user);
     
     boolean existsByGarminActivityId(String garminActivityId);
+
+    boolean existsByDataHash(String dataHash);
     
     @Query("SELECT a FROM Activity a WHERE a.user = :user AND a.syncStatus = 'PENDING' ORDER BY a.activityDate ASC")
     List<Activity> findPendingSyncActivitiesByUser(@Param("user") User user, Pageable pageable);

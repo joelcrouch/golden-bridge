@@ -1,34 +1,46 @@
 package com.goldenbridge.app.controller;
 
+import com.goldenbridge.app.entity.User;
 import com.goldenbridge.app.exception.ActivityDownloadException;
+import com.goldenbridge.app.repository.UserRepository;
 import com.goldenbridge.app.service.GarminIntegrationService;
+import com.goldenbridge.app.service.SyncService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/garmin")
 public class GarminController {
 
     private final GarminIntegrationService garminIntegrationService;
+    private final SyncService syncService;
+    private final UserRepository userRepository;
 
-    public GarminController(GarminIntegrationService garminIntegrationService) {
+    public GarminController(GarminIntegrationService garminIntegrationService, SyncService syncService, UserRepository userRepository) {
         this.garminIntegrationService = garminIntegrationService;
+        this.syncService = syncService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/activities")
     public ResponseEntity<String> getGarminActivities(
             @RequestParam(defaultValue = "0") int start,
-            @RequestParam(defaultValue = "10") int limit) {
+            @RequestParam(defaultValue = "10") int limit,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        String activities = garminIntegrationService.getGarminActivities(start, limit);
-        return ResponseEntity.ok(activities);
+        String activitiesJson = garminIntegrationService.getGarminActivities(start, limit);
+
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        syncService.syncActivities(activitiesJson, user);
+
+        return ResponseEntity.ok("Sync process initiated. Activities are being saved to the database.");
     }
 
     @GetMapping("/activities/{activityId}/download")

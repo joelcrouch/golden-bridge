@@ -166,6 +166,12 @@ public class Activity {
     
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
+
+    public String getRawData() { return rawData; }
+    public void setRawData(String rawData) { this.rawData = rawData; }
+
+    public String getDataHash() { return dataHash; }
+    public void setDataHash(String dataHash) { this.dataHash = dataHash; }
     
     // Add remaining getters/setters for brevity - you can add them as needed
 }
