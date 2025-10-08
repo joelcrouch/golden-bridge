@@ -44,4 +44,6 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     
     @Query("SELECT a FROM Activity a WHERE a.user = :user AND a.syncStatus = 'PENDING' ORDER BY a.activityDate ASC")
     List<Activity> findPendingSyncActivitiesByUser(@Param("user") User user, Pageable pageable);
+
+    List<Activity> findByUserIdAndSyncStatusNot(Long userId, Activity.SyncStatus syncStatus);
 }

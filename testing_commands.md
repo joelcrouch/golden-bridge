@@ -51,7 +51,7 @@ These commands are useful for verifying that the API calls are correctly writing
 Get a command-line shell inside the running PostgreSQL Docker container.
 
 ```bash
-docker compose exec postgres bash
+docker exec -it golden-bridge-postgres bash
 ```
 
 ### Step 2: Connect to the Database

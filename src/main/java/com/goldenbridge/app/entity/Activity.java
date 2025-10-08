@@ -120,7 +120,7 @@ public class Activity {
     
     // Enum for sync status
     public enum SyncStatus {
-        PENDING, IN_PROGRESS, COMPLETED, FAILED, SKIPPED
+        PENDING, IN_PROGRESS, COMPLETED, FAILED, SKIPPED, EXPORTED
     }
     
     // Constructors
@@ -172,6 +172,40 @@ public class Activity {
 
     public String getDataHash() { return dataHash; }
     public void setDataHash(String dataHash) { this.dataHash = dataHash; }
-    
-    // Add remaining getters/setters for brevity - you can add them as needed
+
+    public Integer getAverageHeartRate() { return averageHeartRate; }
+    public void setAverageHeartRate(Integer averageHeartRate) { this.averageHeartRate = averageHeartRate; }
+
+    public Integer getMaxHeartRate() { return maxHeartRate; }
+    public void setMaxHeartRate(Integer maxHeartRate) { this.maxHeartRate = maxHeartRate; }
+
+    public Integer getAveragePower() { return averagePower; }
+    public void setAveragePower(Integer averagePower) { this.averagePower = averagePower; }
+
+    public Integer getMaxPower() { return maxPower; }
+    public void setMaxPower(Integer maxPower) { this.maxPower = maxPower; }
+
+    public BigDecimal getElevationGainMeters() { return elevationGainMeters; }
+    public void setElevationGainMeters(BigDecimal elevationGainMeters) { this.elevationGainMeters = elevationGainMeters; }
+
+    public BigDecimal getAverageSpeedKmh() { return averageSpeedKmh; }
+    public void setAverageSpeedKmh(BigDecimal averageSpeedKmh) { this.averageSpeedKmh = averageSpeedKmh; }
+
+    public BigDecimal getMaxSpeedKmh() { return maxSpeedKmh; }
+    public void setMaxSpeedKmh(BigDecimal maxSpeedKmh) { this.maxSpeedKmh = maxSpeedKmh; }
+
+    public String getFitFilePath() { return fitFilePath; }
+    public void setFitFilePath(String fitFilePath) { this.fitFilePath = fitFilePath; }
+
+    public String getGpxFilePath() { return gpxFilePath; }
+    public void setGpxFilePath(String gpxFilePath) { this.gpxFilePath = gpxFilePath; }
+
+    public String getSyncError() { return syncError; }
+    public void setSyncError(String syncError) { this.syncError = syncError; }
+
+    public LocalDateTime getLastSyncAttempt() { return lastSyncAttempt; }
+    public void setLastSyncAttempt(LocalDateTime lastSyncAttempt) { this.lastSyncAttempt = lastSyncAttempt; }
+
+    public String getGoldenCheetahPath() { return goldenCheetahPath; }
+    public void setGoldenCheetahPath(String goldenCheetahPath) { this.goldenCheetahPath = goldenCheetahPath; }
 }
